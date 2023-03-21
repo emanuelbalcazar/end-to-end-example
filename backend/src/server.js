@@ -2,8 +2,15 @@ const express = require('express');
 const app = express();
 const config = require('./config/config');
 
+require('./database/connection');
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use((error, req, res, next) => {
+    console.log('error', error);
+    return res.status(500).send('Algo se rompio!');
+});
 
 const users = require('./routes/users');
 app.use(users);

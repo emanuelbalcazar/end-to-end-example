@@ -1,28 +1,37 @@
 const express = require('express');
 const router = express.Router();
+const service = require('../services/user.service');
 
-router.get('/users', (req, res) => {
-    return res.json({ nombre: 'emanuel' });
+router.get('/users', async (req, res) => {
+    const users = await service.getUsers();
+    return res.json(users);
 });
 
-router.get('/users/:id', (req, res) => {
+router.get('/users/:id', async (req, res) => {
     const id = req.params.id;
-    return res.json({ id: id });
-});
-
-router.post('/users', (req, res) => {
-    const user = req.body;
+    const user = await service.getById(id);
     return res.json(user);
 });
 
-router.put('/users/:id', (req, res) => {
-    const id = req.params.id;
-    const user = req.body;
-    return res.json({ id: id, update: user });
+router.post('/users', async (req, res) => {
+    try {
+        const userData = req.body;
+        const user = await service.store(userData);
+        return res.json(user);
+    } catch (error) {
+        return res.status(500).json({message: error.message});
+    }
 });
 
-router.delete('/users/:id', (req, res) => {
-    return res.json({ id: req.params.id });
+router.put('/users/:id', async (req, res) => {
+    const id = req.params.id;
+    const toUpdate = req.body;
+    const user = await service.update(id, toUpdate);
+    return res.json(user);
+});
+
+router.delete('/users/:id', async (req, res) => {
+    return res.json(await service.delete(req.params.id));
 });
 
 module.exports = router;
